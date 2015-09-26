@@ -3,21 +3,48 @@
   <head>
     <meta charset="utf-8">
     <style>
-      #mymap { height: 180px; }
+      #mymap { height: 400px; }
     </style>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
   </head>
   <body>
+    <form id="search">
+      <input type="text" name="term" placeholder="Find">
+      <input type="text" name="location" placeholder="Near">
+      <input type="submit" value="Search">
+    </form>
     <div id="mymap"></div>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script>
       var map = L.map('mymap').setView([51.505, -0.09], 13);
       L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
         maxZoom: 19,
         attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a>,Tiles courtesy of<a href="http://hot.openstreetmap.org/" target="_blank"> Humanitarian OpenStreetMap Team </a>'
       }).addTo(map);
-      var marker = L.marker([51.5, -0.09]).addTo(map);
-      marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+      $("#search").on("submit", function(event) {
+        event.preventDefault();
+        var term = $("[name=term]").val();
+        var location = $("[name=location]").val();
+        $.ajax({
+          data: {
+            term: term,
+            location: location
+          },
+          url: "/yelpmeup"
+        }).done(function(data) {
+            var center = data.region.center;
+            map.panTo({lng: center.longitude, lat: center.latitude});
+
+            data.businesses.forEach(function(business) {
+              var coord = business.location.coordinate;
+              var marker = L.marker([coord.latitude, coord.longitude]).addTo(map);
+            });
+          })
+          .fail(function() {
+            alert( "error" );
+          });
+      });
     </script>
   </body>
 </html>
