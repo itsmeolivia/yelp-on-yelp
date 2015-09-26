@@ -1,9 +1,9 @@
-from flask import Flask
-app = Flask(__name__)
+from flask import Flask, send_file
+app = Flask(__name__, static_folder='static', static_url_path='')
 
 @app.route("/")
-def hello():
-    return "Hello World."
+def index():
+    return send_file("static/index.html")
 
 if __name__ == "__main__":
     app.run()
