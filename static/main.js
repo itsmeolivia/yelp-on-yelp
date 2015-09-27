@@ -1,16 +1,21 @@
+var COLORS = ["red", "green", "blue"];
+
 var map = L.map('mymap').setView([51.505, -0.09], 13);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   maxZoom: 19,
   attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a>,Tiles courtesy of<a href="http://hot.openstreetmap.org/" target="_blank"> Humanitarian OpenStreetMap Team </a>'
 }).addTo(map);
+
+var marker_list = [];
+
 $("#search").on("submit", function(event) {
   event.preventDefault();
 
-  var term = $("[name=term]").val();
-  var multiple_terms = term.split(",");
+  var input_term = $("[name=term]").val();
+  var multiple_terms = input_term.split(",");
   var location = $("[name=location]").val();
 
-  multiple_terms.forEach(function(term) {
+  multiple_terms.forEach(function(term, i) {
     $.ajax({
       data: {
         term: term,
@@ -20,12 +25,28 @@ $("#search").on("submit", function(event) {
     })
     .done(function(data) {
       var center = data.region.center;
-      map.panTo({lng: center.longitude, lat: center.latitude});
+      if (i === 0)
+        map.panTo({lng: center.longitude, lat: center.latitude});
 
       data.businesses.forEach(function(business) {
         var coord = business.location.coordinate;
-        var marker = L.marker([coord.latitude, coord.longitude]).addTo(map);
-        marker.bindPopup("<b>" + business.name + "</b><br> Rating: " + business.rating + "<br><a href=" + business.url + ' target="_blank">See more on Yelp!').openPopup();
+        var redMarker = L.AwesomeMarkers.icon({
+          icon: "",
+          markerColor: COLORS[i % COLORS.length]
+        });
+        var new_marker = L.marker([coord.latitude, coord.longitude], {icon: redMarker});
+        var marker_already_exists = marker_list.some(function(old_marker) {
+          var old_location = old_marker.getLatLng();
+          var new_location = new_marker.getLatLng();
+          return old_location.equals(new_location);
+        });
+
+        if (!marker_already_exists) {
+          new_marker.addTo(map);
+          new_marker.bindPopup("<b>" + business.name + "</b><br> Rating: " + business.rating + "<br><a href=" + business.url + ' target="_blank">See more on Yelp!');
+          marker_list.push(new_marker);
+        }
+
       });
     })
     .fail(function() {
