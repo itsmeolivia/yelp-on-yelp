@@ -1,5 +1,7 @@
 from flask import Flask, send_file, jsonify, request
 import yelp
+import os
+
 app = Flask(__name__, static_folder='static', static_url_path='')
 
 @app.route("/")
@@ -14,4 +16,5 @@ def search():
     return jsonify(**yelp.search(term, location))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 33507))
+    app.run(debug=True, port=port)
