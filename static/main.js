@@ -10,6 +10,10 @@ var marker_list = [];
 
 $("#search").on("submit", function(event) {
   event.preventDefault();
+  marker_list.forEach(function(marker){
+    map.removeLayer(marker);
+  });
+  marker_list.length = 0;
 
   var input_term = $("[name=term]").val();
   var multiple_terms = input_term.split(",");
