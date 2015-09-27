@@ -1,9 +1,9 @@
-var COLORS = ["red", "green", "blue"];
+var COLORS = ["red", "green", "blue", "yellow", "purple", "orange", "cadetblue", "lightgray"];
 
 var map = L.map('mymap').setView([51.505, -0.09], 13);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   maxZoom: 19,
-  attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a>,Tiles courtesy of<a href="http://hot.openstreetmap.org/" target="_blank"> Humanitarian OpenStreetMap Team </a>'
+  attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
 var marker_list = [];
